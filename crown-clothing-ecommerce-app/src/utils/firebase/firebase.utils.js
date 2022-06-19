@@ -3,8 +3,11 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect
+  signInWithRedirect,
+  signOut,
 } from 'firebase/auth';
 import {doc, getDoc, getFirestore, setDoc} from 'firebase/firestore';
 
@@ -57,8 +60,13 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
 
 export const signInAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) {
-    throw new Error('Please provide an email and password');
+    // throw new Error('Please provide an email and password');
+    return null;
   }
 
-  return await signInAuthUserWithEmailAndPassword(auth, email, password);
+  return await signInWithEmailAndPassword(auth, email, password);
 }
+
+export const signOutUser = async () => await signOut(auth);
+
+export const onAuthStateChangedListener = async (callback) => await onAuthStateChanged(auth, callback);
