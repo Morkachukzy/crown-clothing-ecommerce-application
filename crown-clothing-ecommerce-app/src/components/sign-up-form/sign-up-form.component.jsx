@@ -35,7 +35,7 @@ export const SignUpForm = () => {
     }
     try {
       const {user} = await createAuthUserWithEmailAndPassword(email, password);
-      const userDocRef = await createUserProfileDocument(user, {displayName});
+      await createUserProfileDocument(user, {displayName});
       resetForm();
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
@@ -47,8 +47,9 @@ export const SignUpForm = () => {
   }
 
   return (
-    <div>
-      <h1>Sign Up with your email and password</h1>
+    <div className="sign-up-container">
+      <h2>Don't have an account?</h2>
+      <span>Sign up with your email and password</span>
       <form onSubmit={handleSubmit}>
         <FormInput
           label="Display Name"
@@ -86,7 +87,7 @@ export const SignUpForm = () => {
           value={confirmPassword}
         />
 
-        <Button  type="submit">Sign Up</Button>
+        <Button type="submit">Sign Up</Button>
       </form>
     </div>
   )
