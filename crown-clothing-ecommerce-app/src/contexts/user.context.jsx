@@ -4,8 +4,7 @@ import {createUserProfileDocument, onAuthStateChangedListener} from "../utils/fi
 
 export const UserContext = createContext({
   currentUser: null,
-  setCurrentUser: () => {
-  },
+  setCurrentUser: () => null,
 })
 
 export const UserProvider = ({children}) => {
@@ -16,6 +15,7 @@ export const UserProvider = ({children}) => {
   useEffect(() => {
     (async () => {
       return onAuthStateChangedListener((user) => {
+        console.log(user)
         if (user) {
           createUserProfileDocument(user)
         }
