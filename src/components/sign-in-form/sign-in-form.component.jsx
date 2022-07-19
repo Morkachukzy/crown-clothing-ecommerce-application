@@ -36,7 +36,6 @@ export const SignInForm = () => {
         password
       );
       resetForm();
-      navigate("/")
     } catch (error) {
       switch (error.code) {
         case "auth/user-not-found":
@@ -54,7 +53,6 @@ export const SignInForm = () => {
 
   const signInWithGoogle = async () => {
     await signInWithGooglePopup();
-    navigate("/")
   };
 
   return (
