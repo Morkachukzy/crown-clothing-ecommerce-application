@@ -1,11 +1,12 @@
 import { useState } from "react";
+import {useNavigate} from "react-router-dom";
 import {
   signInAuthUserWithEmailAndPassword,
   signInWithGooglePopup,
 } from "../../utils/firebase/firebase.utils";
 
 import { FormInput } from "../form-input/form-input.component";
-import { Button } from "../button/button.component";
+import { Button, BUTTON_TYPES } from "../button/button.component";
 import "./sign-in-form.styles.scss";
 
 const defaultFormFields = {
@@ -16,7 +17,7 @@ const defaultFormFields = {
 export const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
-
+  const navigate = useNavigate();
   const resetForm = () => {
     setFormFields(defaultFormFields);
   };
@@ -35,6 +36,7 @@ export const SignInForm = () => {
         password
       );
       resetForm();
+      navigate("/")
     } catch (error) {
       switch (error.code) {
         case "auth/user-not-found":
@@ -52,6 +54,7 @@ export const SignInForm = () => {
 
   const signInWithGoogle = async () => {
     await signInWithGooglePopup();
+    navigate("/")
   };
 
   return (
@@ -78,7 +81,7 @@ export const SignInForm = () => {
         />
         <div className="buttons-container">
           <Button type="submit">Sign In</Button>
-          <Button type="button" buttonType="google" onClick={signInWithGoogle}>
+          <Button buttonType={BUTTON_TYPES.google}  onClick={signInWithGoogle}>
             Google sign in
           </Button>
         </div>
