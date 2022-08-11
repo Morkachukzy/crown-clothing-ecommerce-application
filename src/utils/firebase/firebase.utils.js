@@ -1,38 +1,41 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app';
 import {
-  createUserWithEmailAndPassword,
   getAuth,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
   signInWithRedirect,
+  signInWithPopup,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
-} from "firebase/auth";
+  onAuthStateChanged,
+} from 'firebase/auth';
 import {
+  getFirestore,
   doc,
   getDoc,
-  getFirestore,
   setDoc,
   collection,
   writeBatch,
   query,
   getDocs,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAWALHZEIdvHM4Xh6aIe8BGUqDiFUXWcKo",
-  authDomain: "crown-ecommerce-app-2c2dc.firebaseapp.com",
-  projectId: "crown-ecommerce-app-2c2dc",
-  storageBucket: "crown-ecommerce-app-2c2dc.appspot.com",
-  messagingSenderId: "644582748836",
-  appId: "1:644582748836:web:fc6dd1c24a9ba8ce01ac31",
+  apiKey: 'AIzaSyDDU4V-_QV3M8GyhC9SVieRTDM4dbiT0Yk',
+  authDomain: 'crwn-clothing-db-98d4d.firebaseapp.com',
+  projectId: 'crwn-clothing-db-98d4d',
+  storageBucket: 'crwn-clothing-db-98d4d.appspot.com',
+  messagingSenderId: '626766232035',
+  appId: '1:626766232035:web:506621582dab103a4d08d6',
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
 
 const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: "select_account" });
+
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+});
 
 export const auth = getAuth();
 export const signInWithGooglePopup = () =>
@@ -44,7 +47,8 @@ export const db = getFirestore();
 
 export const addCollectionAndDocuments = async (
   collectionKey,
-  objectsToAdd
+  objectsToAdd,
+  field
 ) => {
   const collectionRef = collection(db, collectionKey);
   const batch = writeBatch(db);
@@ -55,45 +59,40 @@ export const addCollectionAndDocuments = async (
   });
 
   await batch.commit();
-  console.log("done");
+  console.log('done');
 };
 
 export const getCategoriesAndDocuments = async () => {
-  const collectionRef = collection(db, "categories");
+  const collectionRef = collection(db, 'categories');
   const q = query(collectionRef);
 
   const querySnapshot = await getDocs(q);
-
-  const categoryMap = await querySnapshot.docs.reduce((acc, docSnapshot) => {
-    const { title, items } = docSnapshot.data();
-    acc[title.toLowerCase()] = items;
-    return acc;
-  }, {});
-
-  return categoryMap;
+  return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
 };
 
-export const createUserProfileDocument = async (
+export const createUserDocumentFromAuth = async (
   userAuth,
-  additionalInfo = {}
+  additionalInformation = {}
 ) => {
   if (!userAuth) return;
 
-  const userDocRef = await doc(db, "users", userAuth.uid);
+  const userDocRef = doc(db, 'users', userAuth.uid);
+
   const userSnapshot = await getDoc(userDocRef);
 
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
+
     try {
       await setDoc(userDocRef, {
         displayName,
         email,
         createdAt,
-        ...additionalInfo,
+        ...additionalInformation,
       });
     } catch (error) {
-      console.error(`Error creating user: ${error.message}`);
+      console.log('error creating the user', error.message);
     }
   }
 
@@ -101,23 +100,18 @@ export const createUserProfileDocument = async (
 };
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
-  if (!email || !password) {
-    throw new Error("Please provide an email and password");
-  }
+  if (!email || !password) return;
 
   return await createUserWithEmailAndPassword(auth, email, password);
 };
 
 export const signInAuthUserWithEmailAndPassword = async (email, password) => {
-  if (!email || !password) {
-    // throw new Error('Please provide an email and password');
-    return null;
-  }
+  if (!email || !password) return;
 
   return await signInWithEmailAndPassword(auth, email, password);
 };
 
 export const signOutUser = async () => await signOut(auth);
 
-export const onAuthStateChangedListener = async (callback) =>
-  await onAuthStateChanged(auth, callback);
+export const onAuthStateChangedListener = (callback) =>
+  onAuthStateChanged(auth, callback);
